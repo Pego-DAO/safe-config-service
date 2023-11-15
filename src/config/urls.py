@@ -4,12 +4,19 @@ from django.http import HttpResponse
 from django.urls import include, path, re_path
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-
 from config import settings
+from drf_yasg.generators import OpenAPISchemaGenerator
+
+class BothHttpAndHttpsSchemaGenerator(OpenAPISchemaGenerator):
+    def get_schema(self, request=None, public=False):
+        schema = super().get_schema(request, public)
+        schema.schemes = ["http", "https"]
+        return schema
 
 schema_view = get_schema_view(
     validators=["flex", "ssv"],
     public=True,
+    generator_class=BothHttpAndHttpsSchemaGenerator,
     permission_classes=(permissions.AllowAny,),
 )
 
